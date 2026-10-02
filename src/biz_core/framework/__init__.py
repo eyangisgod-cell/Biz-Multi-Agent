@@ -14,6 +14,18 @@ Why this layer exists:
 - Static enforcement: the integration test
   `tests/integration/test_project_structure.py` walks the AST of every
   application submodule and fails if it sees `import agentscope`.
+
+Layered sub-modules (Phase 1.5):
+  agent.py       — BizAgent (subclass of agentscope.Agent)
+  state.py       — BizAgentState (subclass of agentscope.AgentState)
+  tool.py        — BizToolkit (subclass of agentscope.Toolkit)
+  middleware.py  — MiddlewareBase + HookAbort (interception channel)
+  formatter.py   — BizFormatter (subclass of agentscope.FormatterBase)
+  sop.py         — BizSOPEngine + phase constants
+  pipeline.py    — BizGoalPipeline (subclass of agentscope.GoalPipeline)
+  skill.py       — BizSkillLoader (subclass of agentscope.LocalSkillLoader)
+  message.py     — with_biz_metadata() helper
+  model.py       — LiteLLMRouter (independent of agentscope)
 """
 
 from __future__ import annotations
@@ -38,31 +50,52 @@ from agentscope.tool import ToolBase, Toolkit
 # `from biz_core.framework.model import LiteLLMRouter`.
 from biz_core.framework import model as model  # noqa: F401
 
+# ---------------------------------------------------------------------------
+# Biz-specific extensions (Phase 1.5).
+# Application code uses these names rather than the bare AgentScope ones.
+# ---------------------------------------------------------------------------
+from biz_core.framework.agent import BizAgent
+from biz_core.framework.formatter import BizFormatter
+from biz_core.framework.message import BIZ_MSG_META_KEY, with_biz_metadata
+from biz_core.framework.middleware import HookAbort
+from biz_core.framework.pipeline import BizGoalPipeline
+from biz_core.framework.skill import BIZ_SKILLS_DIR, BizSkillLoader
+from biz_core.framework.sop import PHASE_ADVOCATE, PHASE_OPPONENT, PHASE_REVIEWER, BizSOPEngine
+from biz_core.framework.state import BizAgentState
+from biz_core.framework.tool import BizToolkit
+
 __all__ = [
-    # Agent base classes
+    # AgentScope raw re-exports
     "Agent",
     "A2AAgent",
     "RealtimeAgent",
-    # Tools
     "Toolkit",
     "ToolBase",
-    # State / memory
     "AgentState",
     "Task",
-    # Middleware (replaces the originally-proposed "Hook" semantics)
     "MiddlewareBase",
-    # Output formatting
     "FormatterBase",
-    # Multi-agent roundtable (replaces MsgHub for SOP-style flows)
     "SOPEngine",
     "SOP",
-    # Pipeline orchestration
     "GoalPipeline",
-    # Skill hot-loading
     "LocalSkillLoader",
     "Skill",
-    # Message envelope
     "Msg",
+    # Biz extensions
+    "BizAgent",
+    "BizAgentState",
+    "BizToolkit",
+    "BizFormatter",
+    "BizSOPEngine",
+    "BizGoalPipeline",
+    "BizSkillLoader",
+    "HookAbort",
+    "with_biz_metadata",
+    "BIZ_MSG_META_KEY",
+    "BIZ_SKILLS_DIR",
+    "PHASE_ADVOCATE",
+    "PHASE_OPPONENT",
+    "PHASE_REVIEWER",
     # Sub-module
     "model",
 ]

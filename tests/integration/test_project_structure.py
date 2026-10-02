@@ -24,10 +24,12 @@ def test_agentscope_imports_from_editable_install() -> None:
 
 
 def test_biz_core_has_framework_layer() -> None:
-    """Verify biz_core.framework re-exports curated AgentScope primitives."""
+    """Verify biz_core.framework re-exports curated AgentScope primitives
+    and biz-specific extensions."""
     import biz_core.framework as fw
 
     expected = {
+        # AgentScope raw re-exports
         "Agent",
         "Toolkit",
         "ToolBase",
@@ -40,6 +42,16 @@ def test_biz_core_has_framework_layer() -> None:
         "LocalSkillLoader",
         "Skill",
         "Msg",
+        # Phase 1.5 biz extensions
+        "BizAgent",
+        "BizAgentState",
+        "BizToolkit",
+        "BizFormatter",
+        "BizSOPEngine",
+        "BizGoalPipeline",
+        "BizSkillLoader",
+        "HookAbort",
+        "with_biz_metadata",
     }
     missing = expected - set(dir(fw))
     assert not missing, f"biz_core.framework missing re-exports: {missing}"
