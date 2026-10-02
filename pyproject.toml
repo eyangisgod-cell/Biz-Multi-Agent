@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "biz_core"
+version = "0.1.0"
+description = "BizForecast-Shop: Multi-Agent for SMB E-commerce"
+requires-python = ">=3.11"
+dependencies = [
+    # NOTE: agentscope is intentionally NOT a dep here.
+    # It must be editable-installed once at the workspace level
+    # via `pip install -e E:/my-project/agentscope`.
+    # Adding it here would cause pip to resolve file:// into a wheel
+    # and break the editable contract.
+    "litellm>=1.40",
+    "pydantic>=2.0",
+    "opentelemetry-api>=1.20",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "ruff>=0.1",
+    "mypy>=1.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/biz_core"]
+
+[tool.hatch.build.targets.editable]
+packages = ["src/biz_core"]
+
+# allow-direct-references is kept in case future deps need file:// refs.
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "PT"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+strict_optional = true
+warn_unused_ignores = true
+warn_redundant_casts = true
